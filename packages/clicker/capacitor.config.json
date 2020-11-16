@@ -1,0 +1,14 @@
+{
+  "appId": "io.ionic.starter",
+  "appName": "fcl-app",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "dist",
+  "linuxAndroidStudioPath": "/usr/bin/android-studio",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  },
+  "cordova": {}
+}
