@@ -1,0 +1,71 @@
+{
+  "name": "@kickertech/clicker-app",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "resources": "cd clicker && cordova-res android && node scripts/resources.js",
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "android:build": "ionic cap build android --no-open && cd ./android && ./gradlew assemble",
+    "test:unit": "vue-cli-service test:unit",
+    "test:e2e": "vue-cli-service test:e2e",
+    "lint": "vue-cli-service lint"
+  },
+  "repository": {
+    "url": "https://github.com/kickertech/fcl-app"
+  },
+  "main": "background.js",
+  "author": {
+    "name": "Moritz Johner",
+    "email": "beller.moritz@googlemail.com"
+  },
+  "dependencies": {
+    "@angular/core": "^11.0.0",
+    "@capacitor/android": "^2.4.2",
+    "@capacitor/core": "2.4.2",
+    "@ionic-native/core": "^5.29.0",
+    "@ionic-native/zeroconf": "^5.29.0",
+    "@ionic/storage": "^2.3.1",
+    "@ionic/vue": "^5.4.0",
+    "@ionic/vue-router": "^5.4.0",
+    "@kickertech/common": "^1.0.0",
+    "bonjour": "^3.5.0",
+    "cordova-plugin-zeroconf": "^1.4.2",
+    "cordova-res": "^0.15.2",
+    "cordova-sqlite-storage": "^5.1.0",
+    "core-js": "^3.6.5",
+    "lodash": "^4.17.20",
+    "pubsub-js": "^1.9.0",
+    "selfsigned": "^1.10.8",
+    "ssl-validator": "^1.0.7",
+    "uuid": "^8.3.1",
+    "vue": "^3.0.0-0",
+    "vue-router": "^4.0.0-0",
+    "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "2.4.2",
+    "@types/bonjour": "^3.5.7",
+    "@types/jest": "^24.0.19",
+    "@types/lodash": "^4.14.165",
+    "@types/pubsub-js": "^1.8.1",
+    "@types/uuid": "^8.3.0",
+    "@typescript-eslint/eslint-plugin": "^2.33.0",
+    "@typescript-eslint/parser": "^2.33.0",
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-e2e-cypress": "~4.5.0",
+    "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/cli-plugin-router": "~4.5.0",
+    "@vue/cli-plugin-typescript": "~4.5.0",
+    "@vue/cli-plugin-unit-jest": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "@vue/compiler-sfc": "^3.0.0-0",
+    "@vue/eslint-config-typescript": "^5.0.2",
+    "@vue/test-utils": "^2.0.0-0",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^7.0.0-0",
+    "typescript": "~3.9.3",
+    "vue-jest": "^5.0.0-0"
+  },
+  "description": "An Ionic project"
+}
