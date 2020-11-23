@@ -1,0 +1,21 @@
+{
+  "name": "@kickertech/common",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "typescript": "~3.9.3",
+    "vue": "^3.0.0-0",
+    "@ionic/vue": "^5.4.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.19",
+    "@types/webpack-env": "^1.15.3",
+    "@typescript-eslint/parser": "^2.33.0",
+    "@vue/eslint-config-typescript": "^5.0.2"
+  },
+  "author": "",
+  "license": "ISC"
+}
