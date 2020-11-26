@@ -1,25 +1,41 @@
 {
-  "name": "fcl-app",
-  "version": "0.0.1",
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/moolen/fcl-app"
+  },
+  "author": "https://github.com/moolen",
+  "homepage": "https://moolen.github.io/fcl-app/",
+  "license": "MIT",
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "test:unit": "vue-cli-service test:unit",
-    "test:e2e": "vue-cli-service test:e2e",
-    "lint": "vue-cli-service lint"
+    "bootstrap": "lerna bootstrap",
+    "dev": "concurrently --kill-others --success first \"npm start --prefix ./packages/server\" \"npm run serve --prefix ./packages/ui\"",
+    "test": "npm run test:common && npm run test:server && npm run test:ui",
+    "test:common": "npm test --prefix ./packages/common",
+    "test:server": "npm test --prefix ./packages/server",
+    "electron:build": "vue-cli-service electron:build",
+    "electron:serve": "vue-cli-service electron:serve",
+    "test:ui": "npm test --prefix ./packages/ui",
+    "build": "lerna run build",
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs",
+    "docs:deploy": "yarn run docs:build && ./scripts/docsdeploy.sh",
+    "getv": "echo $IMAGE_VERSION",
+    "docker:build": "IMAGE_VERSION=$(node -p \"require('./lerna.json').version\") && docker image build -t $npm_package_config_imageRepo:$IMAGE_VERSION -f ./docker/Dockerfile .",
+    "publish": "lerna publish"
   },
-  "dependencies": {
-    "@capacitor/core": "2.4.2",
-    "@ionic/vue": "^5.4.0",
-    "@ionic/vue-router": "^5.4.0",
-    "core-js": "^3.6.5",
-    "vue": "^3.0.0-0",
-    "vue-router": "^4.0.0-0"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@capacitor/cli": "2.4.2",
+    "concurrently": "^3.6.0",
+    "lerna": "^2.11.0",
+    "@types/bonjour": "^3.5.7",
     "@types/jest": "^24.0.19",
+    "@types/lodash": "^4.14.165",
+    "@types/pubsub-js": "^1.8.1",
+    "@types/uuid": "^8.3.0",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
     "@vue/cli-plugin-babel": "~4.5.0",
@@ -32,10 +48,16 @@
     "@vue/compiler-sfc": "^3.0.0-0",
     "@vue/eslint-config-typescript": "^5.0.2",
     "@vue/test-utils": "^2.0.0-0",
+    "vue-cli-plugin-electron-builder": "^2.0.0-rc.5",
+    "electron": "^10.1.5",
+    "electron-devtools-installer": "^3.1.1",
+    "electron-ssl-pinning": "^1.0.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^7.0.0-0",
     "typescript": "~3.9.3",
     "vue-jest": "^5.0.0-0"
   },
-  "description": "An Ionic project"
+  "engines": {
+    "node": ">= 8"
+  }
 }
