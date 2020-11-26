@@ -1,7 +1,0 @@
-{
-  "name": "fcl-app",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "vue"
-}
