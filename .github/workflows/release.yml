@@ -5,51 +5,57 @@ on:
       - "v*"
 
 jobs:
-  release:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-20.04, windows-latest]
-        name: [macos, linux, windows]
-
-    name: Upload Release Asset
+  create_release:
+    name: Create release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Install Node.js, NPM and Yarn
-        uses: actions/setup-node@v1
-        with:
-          node-version: 15
-
-      - name: build desktop
-        run: |
-          npm config set -g production false
-          npm install
-          npx lerna bootstrap --ci
-          npm run electron:build --prefix ./packages/desktop
-
-      - name: Zip Artifacts
-        run: zip -r -j fcl-desktop.zip packages/desktop/dist_electron/fcl-desktop*
-
-      - name: Create Release
+      - name: Create release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
+          release_name: fcl-desktop ${{ github.ref }}
 
-      - name: Upload Release Asset
+  build_release:
+    runs-on: ${{ matrix.os }}
+    needs: create_release
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-20.04
+            asset_name: fcl-desktop.AppImage
+          - os: macos-latest
+            asset_name: fcl-desktop.dmg
+          - os: windows-latest
+            asset_name: fcl-desktop.exe
+
+    name: Upload Release Asset
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v1
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      - name: build desktop
+        run: |
+          npm config set -g production false
+          make prepare build-desktop
+
+      - name: Upload Asset
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: fcl-desktop.zip
-          asset_name: fcl-desktop-${{ matrix.name }}.zip
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: packages/desktop/dist_electron/${{ matrix.asset_name }}
+          asset_name: ${{ matrix.asset_name }}
           asset_content_type: application/octet-stream

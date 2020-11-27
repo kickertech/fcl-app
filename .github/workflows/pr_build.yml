@@ -1,8 +1,5 @@
 name: Build PR
 on:
-  push:
-    branches:
-      - master
   pull_request:
 
 jobs:
@@ -24,6 +21,4 @@ jobs:
       - name: build desktop
         run: |
           npm config set -g production false
-          npm install
-          npx lerna bootstrap --ci
-          npm run electron:build --prefix ./packages/desktop
+          make prepare build-desktop
