@@ -1,0 +1,29 @@
+name: Build PR
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-20.04, windows-latest]
+    name: Build Desktop App
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v1
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      - name: build desktop
+        run: |
+          npm config set -g production false
+          npm install
+          npx lerna bootstrap --ci
+          npm run electron:build --prefix ./packages/desktop
