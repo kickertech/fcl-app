@@ -59,3 +59,49 @@ jobs:
           asset_path: packages/desktop/dist_electron/${{ matrix.asset_name }}
           asset_name: ${{ matrix.asset_name }}
           asset_content_type: application/octet-stream
+
+  build-android:
+    name: "Build Android App"
+    needs: create_release
+    runs-on: "ubuntu-20.04"
+    steps:
+    - name: Check out Git repository
+      uses: actions/checkout@v2
+
+    - name: build Android App
+      run: |
+        npm config set -g production false
+        make build-android
+
+    - name: Upload Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create_release.outputs.upload_url }}
+        asset_path: packages/clicker/android/app/build/outputs/apk/release/app-release-unsigned.apk
+        asset_name: fcl-clicker.apk
+        asset_content_type: application/octet-stream
+
+  build-docs:
+    name: "Build Docs"
+    runs-on: "ubuntu-20.04"
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+          fetch-depth: 0
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: '0.79.0'
+          extended: true
+
+      - name: Build
+        run: cd documentation && hugo --minify --theme book
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public

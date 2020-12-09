@@ -5,6 +5,7 @@ clean:
 .PHONY: prepare
 prepare:
 	npm i -g vue@^3.0.0 # this is linked
+	npm i -g @ionic/cli
 	npm install
 	npx lerna bootstrap --ci
 	npx lerna link --loglevel=debug --force-local

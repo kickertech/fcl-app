@@ -3,7 +3,7 @@ on:
   pull_request:
 
 jobs:
-  build:
+  build-desktop:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -11,7 +11,7 @@ jobs:
     name: Build Desktop App
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v1
@@ -22,3 +22,37 @@ jobs:
         run: |
           npm config set -g production false
           make prepare build-desktop
+
+  build-android:
+    name: "Build Android App"
+    runs-on: "ubuntu-20.04"
+    steps:
+    - name: Check out Git repository
+      uses: actions/checkout@v2
+
+    - name: Install Node.js, NPM and Yarn
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14
+
+    - name: build Android App
+      run: |
+        npm config set -g production false
+        make prepare build-android
+
+  build-docs:
+    name: "Build Docs"
+    runs-on: "ubuntu-20.04"
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+          fetch-depth: 0
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: '0.75.1'
+          extended: true
+
+      - name: Build
+        run: cd documentation && hugo --minify --theme book
