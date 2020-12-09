@@ -1,0 +1,15 @@
+{
+  "name": "fcl clicker",
+  "short_name": "fcl clicker",
+  "start_url": "/fcl-app/",
+  "scope": "/fcl-app/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/fcl-app/favicon.svg",
+      "sizes": "512x512"
+    }
+  ]
+}
