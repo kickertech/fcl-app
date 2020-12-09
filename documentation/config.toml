@@ -1,0 +1,5 @@
+baseURL = "http://kickertech.github.io/fcl-app"
+languageCode = "en-us"
+title = "fcl clicker"
+pygmentsCodeFences = true
+staticDir = ["static"]

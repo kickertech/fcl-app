@@ -9,7 +9,7 @@ This Application consists of two components:
 * a mobile application (only android for now)
 * a desktop application
 
-![Overview](./docs/overview.png)
+![Overview](./documentation/static/overview.png)
 
 ## Building
 

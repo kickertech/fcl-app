@@ -52,7 +52,6 @@
               <ion-button color="danger" @click="resetClicker()"
                 >RESET CLICKER</ion-button
               >
-              <ion-button>Do FOO</ion-button>
             </ion-col>
           </ion-row>
         </ion-grid>
