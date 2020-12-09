@@ -68,10 +68,15 @@ jobs:
     - name: Check out Git repository
       uses: actions/checkout@v2
 
+    - name: Install Node.js, NPM and Yarn
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14
+
     - name: build Android App
       run: |
         npm config set -g production false
-        make build-android
+        make prepare build-android
 
     - name: Upload Asset
       uses: actions/upload-release-asset@v1
@@ -104,4 +109,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
+          publish_dir: ./documentation/public
