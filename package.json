@@ -27,10 +27,7 @@
     "docker:build": "IMAGE_VERSION=$(node -p \"require('./lerna.json').version\") && docker image build -t $npm_package_config_imageRepo:$IMAGE_VERSION -f ./docker/Dockerfile .",
     "publish": "lerna publish"
   },
-  "dependencies": {},
   "devDependencies": {
-    "concurrently": "^3.6.0",
-    "lerna": "^2.11.0",
     "@types/bonjour": "^3.5.7",
     "@types/jest": "^24.0.19",
     "@types/lodash": "^4.14.165",
@@ -48,16 +45,22 @@
     "@vue/compiler-sfc": "^3.0.0-0",
     "@vue/eslint-config-typescript": "^5.0.2",
     "@vue/test-utils": "^2.0.0-0",
-    "vue-cli-plugin-electron-builder": "^2.0.0-rc.5",
+    "concurrently": "^3.6.0",
     "electron": "^10.1.5",
     "electron-devtools-installer": "^3.1.1",
     "electron-ssl-pinning": "^1.0.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^7.0.0-0",
+    "lerna": "^4.0.0",
     "typescript": "~3.9.3",
+    "vue-cli-plugin-electron-builder": "^2.0.0-rc.5",
     "vue-jest": "^5.0.0-0"
   },
   "engines": {
     "node": ">= 8"
+  },
+  "name": "fcl-app",
+  "dependencies": {
+    "vue": "file:packages/vue"
   }
 }

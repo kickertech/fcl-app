@@ -53,6 +53,9 @@
             <ion-label>Checkbox</ion-label>
             <ion-checkbox slot="start"></ion-checkbox>
           </ion-item>
+          <ion-item>
+            <ion-button @click="scanQR" expand="block">Scan QRCode</ion-button>
+          </ion-item>
         </ion-list>
       </div>
     </ion-content>
@@ -79,7 +82,12 @@ import {
   IonToggle,
 } from "@ionic/vue";
 
-import { testConnection, state as socketState } from "@kickertech/common/socket";
+import {
+  testConnection,
+  state as socketState,
+} from "@kickertech/common/socket";
+import { QRScanner } from "@ionic-native/qr-scanner";
+import { addFingerprint } from "../lib/SSLIntercept";
 
 export default {
   name: "Settings",
@@ -123,8 +131,66 @@ export default {
         });
     };
 
+    const scanQR = async () => {
+      const status = await QRScanner.prepare();
+      if (status.authorized) {
+        const scanSub = QRScanner.scan().subscribe((text: string) => {
+          console.log("Scanned something", text);
+          QRScanner.hide();
+          scanSub.unsubscribe();
+
+          const [ips, pass, fp] = text.split("|");
+          const ipList = ips.split(";");
+          console.log(ipList, pass, fp);
+
+          try {
+            addFingerprint(fp);
+          } catch (e) {
+            console.log(e);
+            return;
+          }
+
+          let validURL = "";
+          let errors = "";
+          ipList.forEach(async (ip) => {
+            if (validURL != "") {
+              return;
+            }
+            const url = `wss://${ip}:9901?server_password=${pass}`;
+            console.log(`testing url: ${url}`);
+            try {
+              await testConnection(url);
+            } catch (e) {
+              errors += `error testing connection: ${e.message}; `;
+              console.log(`error testing connection: ${e.message}`);
+              return;
+            }
+            validURL = url;
+          });
+
+          if (validURL == "") {
+            toastController
+              .create({
+                message: `could not connect: ${errors}`,
+                duration: 2000,
+              })
+              .then((t) => t.present());
+            return;
+          }
+          socketState.url = validURL;
+          toastController
+            .create({
+              message: "OK",
+              duration: 2000,
+            })
+            .then((t) => t.present());
+        });
+      }
+    };
+
     return {
       serverAddressChanged,
+      scanQR,
       serverAddress: socketState.url,
     };
   },

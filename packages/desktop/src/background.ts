@@ -1,7 +1,7 @@
 "use strict";
 import path from "path";
 import { promises as fs } from "fs";
-import https from "https";
+import { lookup as mime } from "mime-types"
 import { app, protocol, BrowserWindow } from "electron";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 
@@ -41,7 +41,7 @@ async function createWindow() {
   await initCert();
   const accessKey = await initAccessKey();
   const fingerprint = await getCertFingerprint();
-  let serverConfig = await readConfig();
+  const serverConfig = await readConfig();
 
   // pin local server certificate
   win.webContents.session.setCertificateVerifyProc(
@@ -64,9 +64,35 @@ async function createWindow() {
     accessKey,
     fingerprint,
     eventStore,
-    win.webContents.send.bind(win.webContents),
-    (srv: https.Server) => {}
+    win.webContents.send.bind(win.webContents)
   );
+
+  protocol.registerBufferProtocol("asset", async (request, respond) => {
+    console.log(request.url)
+    let filePath = new URL(request.url).pathname;
+    filePath = decodeURI(filePath);
+    console.log(`loading: ${filePath}`);
+    if (filePath == "") {
+      respond({ mimeType: "text", data: `file '${filePath}' not found` });
+      return;
+    }
+    // prevent directory traversal
+    if (filePath.indexOf(appDir()) !== 0 ){
+      respond({ mimeType: "text", data: `not allowed: file '${filePath}' not within ${appDir()}` });
+      return;
+    }
+    let data: any;
+    try {
+      data = await fs.readFile(filePath);
+    } catch (e) {
+      console.error(`Failed to read ${filePath} on asset protocol`, e);
+      respond({ mimeType: "text", data: `file ${filePath} not found` });
+      return;
+    }
+
+    const mimeType = mime(filePath)
+    respond({ mimeType, data });
+  })
 
   // Load the index.html from `ASSETS_PATH` or relative to `__dirname`
   protocol.registerBufferProtocol("app", async (request, respond) => {
@@ -83,24 +109,13 @@ async function createWindow() {
       respond({ mimeType: "text", data: `file ${filePath} not found` });
       return;
     }
-    const extension = path.extname(pathName).toLowerCase();
-    let mimeType = "";
-    if (extension === ".js") {
-      mimeType = "text/javascript";
-    } else if (extension === ".html") {
-      mimeType = "text/html";
-    } else if (extension === ".css") {
-      mimeType = "text/css";
-    } else if (extension === ".svg" || extension === ".svgz") {
-      mimeType = "image/svg+xml";
-    } else if (extension === ".json") {
-      mimeType = "application/json";
-    }
+
+    const mimeType = mime(pathName)
     respond({ mimeType, data });
   });
 
   // use webpack dev server url or default to app:// protocol
-  let url = process.env.WEBPACK_DEV_SERVER_URL || "app://./index.html";
+  const url = process.env.WEBPACK_DEV_SERVER_URL || "app://./index.html";
   win.loadURL(url);
   win.webContents.on("did-fail-load", () => {
     win.loadURL(url);
