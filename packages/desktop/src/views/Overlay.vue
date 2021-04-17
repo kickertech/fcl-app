@@ -102,7 +102,7 @@
           </ion-row>
           <ion-row>
             <ion-col>
-              <img className="logo" v-bind:src="'asset://' + state.leftLogo" />
+              <img class="logo" v-bind:class="{ empty: state.streamerLogo == '' }" v-bind:src="'asset://' + state.leftLogo" />
               <ion-button color="light" @click="uploadLogo('left')"
                 >Upload Logo</ion-button
               >
@@ -111,7 +111,7 @@
               >
             </ion-col>
             <ion-col>
-              <img className="logo" v-bind:src="'asset://' + state.rightLogo" />
+              <img class="logo" v-bind:class="{ empty: state.streamerLogo == '' }" v-bind:src="'asset://' + state.rightLogo" />
               <ion-button color="light" @click="uploadLogo('right')"
                 >Upload Logo</ion-button
               >

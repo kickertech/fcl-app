@@ -9,14 +9,14 @@
       </ion-toolbar>
     </ion-header>
 
-    <ion-content :fullscreen="true">
+    <ion-content :fullscreen="true" :class="{ scanning: state.scanning }">
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">Settings</ion-title>
         </ion-toolbar>
       </ion-header>
 
-      <div id="settings">
+      <div id="settings" ref="settings">
         <!-- List of Input Items -->
         <ion-list>
           <ion-item>
@@ -29,34 +29,11 @@
               v-model="serverAddress"
             ></ion-input>
           </ion-item>
-          <ion-item>
-            <ion-label>Toggle</ion-label>
-            <ion-toggle slot="end"></ion-toggle>
-          </ion-item>
-          <ion-item>
-            <ion-label>Radio</ion-label>
-            <ion-radio slot="end"></ion-radio>
-          </ion-item>
-          <ion-item>
-            <ion-label>Update Interval</ion-label>
-            <ion-range
-              min="3"
-              max="15"
-              step="1"
-              snaps="true"
-              ticks="true"
-              color="danger"
-              pin="true"
-            ></ion-range>
-          </ion-item>
-          <ion-item>
-            <ion-label>Checkbox</ion-label>
-            <ion-checkbox slot="start"></ion-checkbox>
-          </ion-item>
-          <ion-item>
-            <ion-button @click="scanQR" expand="block">Scan QRCode</ion-button>
-          </ion-item>
         </ion-list>
+        <ion-button @click="scanQR" expand="block">Scan QRCode</ion-button>
+      </div>
+      <div id="cancel" ref="cancel" :class="{ scanning: state.scanning }">
+        <ion-button  @click="cancelScan" expand="block">Cancel</ion-button>
       </div>
     </ion-content>
   </ion-page>
@@ -65,7 +42,6 @@
 <script lang="ts">
 import {
   toastController,
-  IonRange,
   IonButtons,
   IonContent,
   IonHeader,
@@ -75,12 +51,11 @@ import {
   IonList,
   IonItem,
   IonToolbar,
-  IonCheckbox,
   IonInput,
   IonLabel,
-  IonRadio,
-  IonToggle,
 } from "@ionic/vue";
+
+import { ref, reactive } from "vue";
 
 import {
   testConnection,
@@ -99,21 +74,19 @@ export default {
     IonPage,
     IonTitle,
     IonToolbar,
-    IonCheckbox,
     IonInput,
     IonItem,
     IonList,
     IonLabel,
-    IonRadio,
-    IonToggle,
-    IonRange,
   },
   setup() {
+    const state = reactive({
+      scanning: false,
+    }) as any;
+
     const serverAddressChanged = (e: any) => {
       testConnection(e.detail.value)
         .then(async (result) => {
-          console.log("done testing", result);
-
           socketState.url = e.detail.value;
           const toast = await toastController.create({
             message: "connected to server",
@@ -122,7 +95,6 @@ export default {
           return toast.present();
         })
         .catch(async (err) => {
-          console.log("err testing", err);
           const toast = await toastController.create({
             message: `error testing server connection: ${err}`,
             duration: 2000,
@@ -131,18 +103,32 @@ export default {
         });
     };
 
+    const settings = ref(null);
+    const cancel = ref(null);
+    let scanSub: any;
     const scanQR = async () => {
-      const status = await QRScanner.prepare();
+      console.log("start qr scan")
+      state.scanning = true
+      let status = {} as any;
+      try {
+        status = await QRScanner.prepare();
+      }catch(e) {
+        console.log(e)
+      }
       if (status.authorized) {
-        const scanSub = QRScanner.scan().subscribe((text: string) => {
-          console.log("Scanned something", text);
+        (settings.value as any).style.transform = "translateX(-100%)";
+        (cancel.value as any).style.transform = "translateX(0%)";
+        QRScanner.show();
+        scanSub = QRScanner.scan().subscribe(async (text: string) => {
+          state.scanning = false
           QRScanner.hide();
           scanSub.unsubscribe();
+          QRScanner.destroy();
+          (settings.value as any).style.transform = "translateX(0%)";
+          (cancel.value as any).style.transform = "translateX(100%)";
 
           const [ips, pass, fp] = text.split("|");
           const ipList = ips.split(";");
-          console.log(ipList, pass, fp);
-
           try {
             addFingerprint(fp);
           } catch (e) {
@@ -152,10 +138,8 @@ export default {
 
           let validURL = "";
           let errors = "";
-          ipList.forEach(async (ip) => {
-            if (validURL != "") {
-              return;
-            }
+
+          for (const ip of ipList) {
             const url = `wss://${ip}:9901?server_password=${pass}`;
             console.log(`testing url: ${url}`);
             try {
@@ -166,7 +150,8 @@ export default {
               return;
             }
             validURL = url;
-          });
+            break
+          }
 
           if (validURL == "") {
             toastController
@@ -180,7 +165,7 @@ export default {
           socketState.url = validURL;
           toastController
             .create({
-              message: "OK",
+              message: "Connected",
               duration: 2000,
             })
             .then((t) => t.present());
@@ -188,9 +173,22 @@ export default {
       }
     };
 
+    const cancelScan = () => {
+      state.scanning = false
+      if(scanSub) {
+        scanSub.unsubscribe();
+      }
+      QRScanner.destroy();
+      (settings.value as any).style.transform = "translateX(0%)";
+    }
+
     return {
       serverAddressChanged,
       scanQR,
+      cancelScan,
+      settings,
+      cancel,
+      state,
       serverAddress: socketState.url,
     };
   },
@@ -227,4 +225,31 @@ ion-menu-button {
 #container a {
   text-decoration: none;
 }
+
+#background-content{
+  background: transparent;
+}
+
+#settings {
+  transition: .3s ease-out;
+}
+
+#cancel {
+  position: absolute;
+  bottom: 0;
+  left: 8px;
+  right: 8px;
+  height: 8vh;
+  display: none;
+  transition: .3s ease-out;
+  transform: translateX(100%);
+}
+
+#cancel.scanning{
+  display: block;
+}
+ion-content.scanning::part(background) {
+    background: transparent;
+}
+
 </style>

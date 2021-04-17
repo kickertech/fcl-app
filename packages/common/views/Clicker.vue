@@ -207,7 +207,7 @@
               <ion-button color="light" @click="undo()">UNDO</ion-button>
             </ion-col>
             <ion-col size="3">
-              <ion-button color="light" @click="reset()">GAME RESET</ion-button>
+              <ion-button color="light" @click="reset()">RESET</ion-button>
             </ion-col>
           </ion-row>
         </ion-grid>

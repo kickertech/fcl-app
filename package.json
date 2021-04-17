@@ -1,66 +1,13 @@
 {
-  "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/moolen/fcl-app"
-  },
-  "author": "https://github.com/moolen",
-  "homepage": "https://moolen.github.io/fcl-app/",
-  "license": "MIT",
-  "scripts": {
-    "bootstrap": "lerna bootstrap",
-    "dev": "concurrently --kill-others --success first \"npm start --prefix ./packages/server\" \"npm run serve --prefix ./packages/ui\"",
-    "test": "npm run test:common && npm run test:server && npm run test:ui",
-    "test:common": "npm test --prefix ./packages/common",
-    "test:server": "npm test --prefix ./packages/server",
-    "electron:build": "vue-cli-service electron:build",
-    "electron:serve": "vue-cli-service electron:serve",
-    "test:ui": "npm test --prefix ./packages/ui",
-    "build": "lerna run build",
-    "docs:dev": "vuepress dev docs",
-    "docs:build": "vuepress build docs",
-    "docs:deploy": "yarn run docs:build && ./scripts/docsdeploy.sh",
-    "getv": "echo $IMAGE_VERSION",
-    "docker:build": "IMAGE_VERSION=$(node -p \"require('./lerna.json').version\") && docker image build -t $npm_package_config_imageRepo:$IMAGE_VERSION -f ./docker/Dockerfile .",
-    "publish": "lerna publish"
-  },
-  "devDependencies": {
-    "@types/bonjour": "^3.5.7",
-    "@types/jest": "^24.0.19",
-    "@types/lodash": "^4.14.165",
-    "@types/pubsub-js": "^1.8.1",
-    "@types/uuid": "^8.3.0",
-    "@typescript-eslint/eslint-plugin": "^2.33.0",
-    "@typescript-eslint/parser": "^2.33.0",
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-e2e-cypress": "~4.5.0",
-    "@vue/cli-plugin-eslint": "~4.5.0",
-    "@vue/cli-plugin-router": "~4.5.0",
-    "@vue/cli-plugin-typescript": "~4.5.0",
-    "@vue/cli-plugin-unit-jest": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
-    "@vue/compiler-sfc": "^3.0.0-0",
-    "@vue/eslint-config-typescript": "^5.0.2",
-    "@vue/test-utils": "^2.0.0-0",
-    "concurrently": "^3.6.0",
-    "electron": "^10.1.5",
-    "electron-devtools-installer": "^3.1.1",
-    "electron-ssl-pinning": "^1.0.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-vue": "^7.0.0-0",
-    "lerna": "^4.0.0",
-    "typescript": "~3.9.3",
-    "vue-cli-plugin-electron-builder": "^2.0.0-rc.5",
-    "vue-jest": "^5.0.0-0"
-  },
-  "engines": {
-    "node": ">= 8"
-  },
   "name": "fcl-app",
-  "dependencies": {
-    "vue": "file:packages/vue"
-  }
+  "version": "1.0.0",
+  "main": "index.js",
+  "private": true,
+  "repository": "git@github.com:kickertech/fcl-app.git",
+  "author": "Moritz Johner <beller.moritz@googlemail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "lerna": "^4.0.0"
+  },
+  "dependencies": {}
 }
