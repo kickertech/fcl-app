@@ -40,6 +40,7 @@ export const RootHandler = (
       break;
     case KIND_SERVER_SYNC:
       handleServerSync(ws, msg as FclSync, store, ipcSend)
+      break;
     case KIND_CONTROL_EVENT:
       handleControlEvent(ws, msg as FclControlEvent, store, ipcSend);
       break;

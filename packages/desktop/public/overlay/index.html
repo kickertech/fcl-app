@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Overlay</title>
+  <meta name="color-scheme" content="light dark" />
+  <meta name="viewport"
+    content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto');
+
+    :root {
+      --bkggrey: #ccc;
+      --bkgdark: #1d1d1b;
+      --textinverted: #eee;
+      --bkg: #eee;
+      --bkgwhite: #fff;
+      --red: #fc0303;
+      --linee: #999;
+    }
+
+    body {
+      background-color: rgba(0, 0, 0, 0) !important;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      width: 100%;
+      display: grid;
+      font-family: 'Roboto', sans-serif;
+      font-size: 2em;
+      grid-template: 80px / 10% 35% 4% 2% 4% 35% 10% 10%;
+    }
+
+    .streamerlogo {
+      position: relative;
+      padding: 5px 10px;
+      background-color: #1d1d1d;
+      background-size: contain !important;
+    }
+
+    .box {
+      font-family: 'Roboto', cursive;
+      font-size: .8em;
+      font-weight: bold;
+      position: relative;
+      text-align: center;
+    }
+
+    .boxleftpoints,
+    .boxrightpoints,
+    .space {
+      font-weight: bold;
+    }
+
+    .space {
+      text-align: center;
+    }
+
+    .boxteamleft,
+    .boxteamright {
+      background: var(--bkg);
+    }
+
+    .boxtimer {
+      color: var(--textinverted);
+      background: var(--bkgdark);
+      grid-column: 7 / 8;
+      border-top-right-radius: 20px;
+      border-bottom-right-radius: 20px;
+      line-height: 80px;
+    }
+
+    .boxleftpoints,
+    .boxrightpoints,
+    .space {
+      background: var(--bkggrey);
+    }
+
+    /* soccer.css */
+    .containersoccer div {
+      text-align: center;
+      grid-row: 1/2;
+    }
+
+    .streamerlogo {
+      grid-column: 1 / 2;
+    }
+
+    .boxteamleft {
+      grid-column: 2 / 3;
+    }
+
+    .boxleftpoints {
+      grid-column: 3 / 4;
+      text-align: right;
+    }
+
+    .space {
+      grid-column: 4 / 5;
+    }
+
+    .boxrightpoints {
+      grid-column: 5 / 6;
+      text-align: left;
+    }
+
+    .boxteamright {
+      grid-column: 6 / 7;
+    }
+
+    .labelmoment {
+      grid-column: 8 / 9;
+    }
+
+    .streamerlogo,
+    .streamerlogo:before {
+      border-top-left-radius: 20px;
+      border-bottom-left-radius: 20px;
+    }
+
+    .boxleftpoints {
+      text-align: right;
+    }
+
+    .boxrightpoints {
+      text-align: left;
+    }
+
+    .boxleftpoints,
+    .boxrightpoints,
+    .space {
+      background: var(--bkggrey);
+    }
+
+    .boxteamleft,
+    .boxteamright,
+    .boxleftpoints,
+    .boxrightpoints,
+    .space {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .boxleftpoints,
+    .space,
+    .boxrightpoints,
+    .streamerlogo:before {
+      background-color: #1d1d1d;
+      color: #fff;
+    }
+
+    .streamerlogo {
+      position: relative;
+    }
+
+    .streamerlogo img {
+      width: 80%;
+      margin: 0 auto;
+      position: relative;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .boxteamleft .logo,
+    .boxteamright .logo {
+      display: none;
+      width: 150px;
+      height: 150px;
+      margin: -35px 0 -35px 0;
+      /*padding: 5px;*/
+      /*border-radius: 100px;*/
+      background-color: #fff;
+    }
+
+    .boxteamleft .name,
+    .boxteamright .name {
+      padding: 0 1vw;
+    }
+
+    .boxteamleft {
+      justify-content: flex-end;
+    }
+
+    .boxteamright {
+      justify-content: flex-start;
+      ;
+    }
+
+    .boxleftpoints,
+    .boxteamleft {
+      border-left: solid 1vw #999;
+    }
+
+    .boxrightpoints,
+    .boxteamright {
+      border-right: solid 1vw #999;
+    }
+
+    .containersoccer {
+      margin: 30px 0;
+    }
+
+    .match_points {
+      width: 100%;
+      display: none;
+      position: absolute;
+      top: 110%;
+      height: 30px;
+      line-height: 30px;
+      font-size: 16px;
+      background: var(--bkgdark);
+    }
+    .boxleftpoints .match_points {
+      right: 0;
+      width: 30px;
+    }
+    .boxrightpoints .match_points {
+      left: 0;
+      width: 30px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <section id="boxes">
+      <div class="container containersoccer">
+        <div class="streamerlogo">
+          <img  id="streamer_logo" />
+        </div>
+
+        <div class="box boxteamleft">
+          <div class="name" id="team_1"></div>
+          <img class="logo" id="team_1_logo" />
+        </div>
+        <div class="box boxleftpoints">
+          <div class="current_set" id="points_1"></div>
+          <div class="match_points" id="matchpoints_1"></div>
+        </div>
+        <div class="space">-</div>
+        <div class="box boxrightpoints">
+          <div class="current_set" id="points_2"></div>
+          <div class="match_points" id="matchpoints_2"></div>
+        </div>
+        <div class="box boxteamright">
+          <img class="logo" id="team_2_logo" />
+          <div class="name" id="team_2"></div>
+        </div>
+        <div class="box boxtimer" id="timer">:30</div>
+      </div>
+    </section>
+  </div>
+  <script type="text/javascript">
+    const renderLogo = (node, src) => {
+      if (src) {
+        node.src = `/logo/${src}`
+        node.style.display = "block";
+      } else {
+        node.style.display = "none";
+      }
+    }
+
+    const renderMatchpoints = (node, pts, otherpts) => {
+      if (pts) {
+        node.innerText = pts
+        node.style.display = "block";
+      } else if(otherpts){
+        // if other team has points, render 0
+        node.innerText = "0"
+        node.style.display = "block";
+      }else {
+        // if no one has points, do not display
+        node.style.display = "none";
+      }
+    }
+
+    const render = (data) => {
+      renderLogo(document.querySelector("#streamer_logo"), data.streamerLogo)
+      renderLogo(document.querySelector("#team_1_logo"), data.leftLogo)
+      renderLogo(document.querySelector("#team_2_logo"), data.rightLogo)
+      renderMatchpoints(document.querySelector("#matchpoints_1"), data.matchpointsLeft, data.matchpointsRight)
+      renderMatchpoints(document.querySelector("#matchpoints_2"), data.matchpointsRight, data.matchpointsLeft)
+
+      document.querySelector("#team_1").innerText = data.leftName || ""
+      document.querySelector("#team_2").innerText = data.rightName || ""
+      document.querySelector("#points_1").innerText = data.leftScore || "0"
+      document.querySelector("#points_2").innerText = data.rightScore || "0"
+    }
+
+    const update = () => {
+      fetch("http://localhost:9902/api", { method: "GET" })
+        .then((res) => res.json())
+        .then(render)
+    }
+    update()
+    setInterval(update, 1000)
+
+  </script>
+</body>
+
+</html>

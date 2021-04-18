@@ -37,6 +37,13 @@
             <ion-label position="stacked">TLS Fingerprint</ion-label>
             <p class="fingerprint">{{ state.certFingerprint }}</p>
           </ion-item>
+          <ion-item>
+            <ion-label position="stacked">IP Addresses</ion-label>
+            <p class="fingerprint">{{ getIPAddress().join(", ") }}</p>
+          </ion-item>
+          <ion-item>
+            <canvas ref="canvas" class="qr-code"></canvas>
+          </ion-item>
         </ion-list>
         <ion-button
           class="disconnect-btn"
@@ -67,7 +74,9 @@ import {
 } from "@ionic/vue";
 
 import { ipcRenderer } from "electron";
-import { reactive, watch, toRaw } from "vue";
+import { ref, reactive, watch, toRaw, onMounted } from "vue";
+import { networkInterfaces } from "os";
+import QRCode from "qrcode";
 
 export default {
   name: "Settings",
@@ -94,18 +103,50 @@ export default {
       certFingerprint: "",
     }) as any;
 
+    const getIPAddress = () => {
+      "use strict";
+
+      const nets = networkInterfaces();
+      const results = []; // Or just '{}', an empty object
+
+      for (const name of Object.keys(nets)) {
+        for (const net of nets[name]) {
+          // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
+          if (net.family === "IPv4" && !net.internal) {
+            results.push(net.address);
+          }
+        }
+      }
+      return results
+    };
+
+    const canvas = ref(null);
+    const updateQRCode = () => {
+      const ips = getIPAddress()
+      const data = `${ips.join(";")}|${state.config.serverPassword}|${state.certFingerprint}`;
+      QRCode.toCanvas(canvas.value, data, (err) => {
+        console.log(err);
+      });
+    };
+    onMounted(updateQRCode);
+
     (async () => {
       const { config, fingerprint } = await ipcRenderer.invoke("settings:sync");
       Object.keys(config).forEach((key) => {
         state.config[key] = config[key];
       });
       state.certFingerprint = fingerprint;
+      updateQRCode();
     })();
 
-    watch([() => state.config.serverName, () => state.config.serverPassword], () => {
-      console.log(`invoking update`, state.config)
-      ipcRenderer.invoke("settings:update", toRaw(state).config);
-    });
+    watch(
+      [() => state.config.serverName, () => state.config.serverPassword],
+      () => {
+        console.log(`invoking update`, state.config);
+        ipcRenderer.invoke("settings:update", toRaw(state).config);
+        updateQRCode()
+      }
+    );
 
     function disconnectClients() {
       ipcRenderer.send("settings:disconnectClients");
@@ -113,10 +154,11 @@ export default {
 
     return {
       state,
+      canvas,
+      getIPAddress,
       disconnectClients,
     };
   },
-  methods: {},
 };
 </script>
 
@@ -156,5 +198,12 @@ ion-menu-button {
 
 #container a {
   text-decoration: none;
+}
+
+.qr-code {
+  width: 300px;
+  height: 300px;
+  background: lightgrey;
+  margin: 0 auto;
 }
 </style>

@@ -35,6 +35,17 @@
         <ion-grid>
           <ion-row>
             <ion-col>
+              <iframe
+                class="overlay-preview"
+                src="http://localhost:9902"
+              ></iframe>
+            </ion-col>
+          </ion-row>
+          <ion-item-divider>
+            <ion-label> </ion-label>
+          </ion-item-divider>
+          <ion-row>
+            <ion-col>
               <ion-item>
                 <ion-label position="stacked">Left Team</ion-label>
                 <ion-input v-model="state.leftName"></ion-input>
@@ -48,32 +59,119 @@
             </ion-col>
           </ion-row>
           <ion-row>
+            <ion-col size="3">
+              <ion-item>
+                <ion-label position="stacked">Set points Left</ion-label>
+                <ion-input disabled="true">{{
+                  state.incomingEvents
+                    .getCurrentSet(state.selectedNamespace)
+                    .score()[0]
+                }}</ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size="3">
+              <ion-item>
+                <ion-label position="stacked">Matchpoints Left</ion-label>
+                <ion-input disabled="true">{{
+                  matchPoints(
+                    state.incomingEvents.getSets(state.selectedNamespace)
+                  )[0]
+                }}</ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size="3">
+              <ion-item>
+                <ion-label position="stacked">Set points Right</ion-label>
+                <ion-input disabled="true">{{
+                  state.incomingEvents
+                    .getCurrentSet(state.selectedNamespace)
+                    .score()[1]
+                }}</ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size="3">
+              <ion-item>
+                <ion-label position="stacked">Matchpoints Right</ion-label>
+                <ion-input disabled="true">{{
+                  matchPoints(
+                    state.incomingEvents.getSets(state.selectedNamespace)
+                  )[1]
+                }}</ion-input>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <img class="logo" v-bind:class="{ empty: state.streamerLogo == '' }" v-bind:src="'asset://' + state.leftLogo" />
+              <ion-button color="light" @click="uploadLogo('left')"
+                >Upload Logo</ion-button
+              >
+              <ion-button color="danger" @click="clearLogo('left')"
+                >Clear Logo</ion-button
+              >
+            </ion-col>
+            <ion-col>
+              <img class="logo" v-bind:class="{ empty: state.streamerLogo == '' }" v-bind:src="'asset://' + state.rightLogo" />
+              <ion-button color="light" @click="uploadLogo('right')"
+                >Upload Logo</ion-button
+              >
+              <ion-button color="danger" @click="clearLogo('right')"
+                >Clear Logo</ion-button
+              >
+            </ion-col>
+          </ion-row>
+          <ion-item-divider>
+            <ion-label> </ion-label>
+          </ion-item-divider>
+          <ion-row>
+            <ion-col size="6">
+              <ion-label class="ion-text-wrap">Streamer Logo</ion-label>
+              <p>
+                Upload your Logo here. It will be displayed on the streaming
+                overlay. You can preview it
+                <a target="_blank" href="http://localhost:9902">here</a>.
+              </p>
+              <img
+                class="logo"
+                v-bind:class="{ empty: state.streamerLogo == '' }"
+                v-bind:src="'asset://' + state.streamerLogo"
+              />
+              <ion-button color="light" @click="uploadLogo('streamer')"
+                >Upload Streamer Logo</ion-button
+              >
+              <ion-button color="danger" @click="clearLogo('streamer')"
+                >Clear Logo</ion-button
+              >
+            </ion-col>
+            <ion-col size="6">
+              <div id="logs">
+                <h3>Event Log</h3>
+                <div
+                  v-for="(set, i) in state.incomingEvents.getSets(
+                    state.selectedNamespace
+                  )"
+                  :key="i"
+                  class="set"
+                >
+                  <h3>Set {{ i + 1 }}</h3>
+                  <ul class="event-list">
+                    <li v-for="(event, j) in set.events" :key="j">
+                      {{ event.toString() }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </ion-col>
+          </ion-row>
+          <ion-item-divider>
+            <ion-label> </ion-label>
+          </ion-item-divider>
+          <ion-row>
             <ion-col>
               <ion-button color="danger" @click="resetClicker()"
                 >RESET CLICKER</ion-button
               >
             </ion-col>
-          </ion-row>
-        </ion-grid>
-        <ion-grid>
-          <ion-row>
-            <div id="logs">
-              <h3>EVENTS</h3>
-              <div
-                v-for="(set, i) in state.incomingEvents.getSets(
-                  state.selectedNamespace
-                )"
-                :key="i"
-                class="set"
-              >
-                <h3>Set {{ i + 1 }}</h3>
-                <ul>
-                  <li v-for="(event, j) in set.events" :key="j">
-                    {{ event.toString() }}
-                  </li>
-                </ul>
-              </div>
-            </div>
           </ion-row>
         </ion-grid>
       </div>
@@ -86,6 +184,7 @@ import {
   IonButtons,
   IonGrid,
   IonItem,
+  IonItemDivider,
   IonInput,
   IonLabel,
   IonRow,
@@ -125,6 +224,7 @@ export default {
     IonLabel,
     IonGrid,
     IonItem,
+    IonItemDivider,
     IonRow,
     IonCol,
     IonSelectOption,
@@ -141,16 +241,12 @@ export default {
     const state = reactive({
       selectedNamespace: "default",
       leftName: "",
+      leftLogo: "",
       rightName: "",
+      rightLogo: "",
+      streamerLogo: "",
       connectedClients: 0,
-      incomingEvents: new EventStore({
-        default: {
-          resourceVersion: 0,
-          leftName: "",
-          rightName: "",
-          sets: [new Set()],
-        },
-      }),
+      incomingEvents: new EventStore(),
     });
 
     watch([() => state.leftName, () => state.rightName], () => {
@@ -190,9 +286,19 @@ export default {
       state.leftName = state.incomingEvents.getLeftName(
         state.selectedNamespace
       );
+      state.leftLogo = state.incomingEvents.getLeftLogo(
+        state.selectedNamespace
+      );
       state.rightName = state.incomingEvents.getRightName(
         state.selectedNamespace
       );
+      state.rightLogo = state.incomingEvents.getRightLogo(
+        state.selectedNamespace
+      );
+      state.streamerLogo = state.incomingEvents.getStreamerLogo(
+        state.selectedNamespace
+      );
+
       ipcRenderer.on("wss:sync", (ch: any, event: any) => {
         console.log(`wss:sync`, event);
       });
@@ -233,6 +339,64 @@ export default {
       });
     };
 
+    const uploadLogo = (pos: string) => {
+      ipcRenderer
+        .invoke("overlay:fileselect:logo", {
+          position: pos,
+          namespace: state.selectedNamespace,
+        })
+        .then((result) => {
+          switch (pos) {
+            case "left":
+              state.leftLogo = result.file;
+              break;
+            case "right":
+              state.rightLogo = result.file;
+              break;
+            case "streamer":
+              state.streamerLogo = result.file;
+              break;
+          }
+        });
+    };
+
+    const clearLogo = (pos: string) => {
+      ipcRenderer
+        .invoke("overlay:clear:logo", {
+          position: pos,
+          namespace: state.selectedNamespace,
+        })
+        .then(() => {
+          switch (pos) {
+            case "left":
+              state.leftLogo = "";
+              break;
+            case "right":
+              state.rightLogo = "";
+              break;
+            case "streamer":
+              state.streamerLogo = "";
+              break;
+          }
+        });
+    };
+
+    const matchPoints = (sets: Set[]) => {
+      let lwon = 0;
+      let rwon = 0;
+      sets.pop(); // ignore current set
+      sets.forEach((set) => {
+        const [lgoals, rgoals] = set.score();
+        if (lgoals > rgoals) {
+          lwon++;
+        } else {
+          rwon++;
+        }
+      });
+
+      return [lwon, rwon];
+    };
+
     onUnmounted(() => {
       ipcRenderer.removeAllListeners("wss:sync");
       ipcRenderer.removeAllListeners("wss:event");
@@ -254,18 +418,43 @@ export default {
       events: state.incomingEvents.get(state.selectedNamespace),
       getEventName,
       resetClicker,
+      uploadLogo,
+      clearLogo,
+      matchPoints,
     };
   },
 };
 </script>
 
 <style scoped>
-
 .select-wrapper {
   display: flex;
 }
 
 .select-wrapper .namespace-selector {
   margin-right: 1em;
+}
+
+.logo {
+  display: block;
+  margin: 10px auto;
+  width: auto;
+  height: 150px;
+  border: 1px solid #ddd;
+}
+
+.logo.empty {
+  background: lightgrey;
+  border: 1px solid darkgrey;
+}
+.overlay-preview {
+  width: 100%;
+  border: 1px solid #666;
+  background: indianred;
+}
+
+.event-list {
+  max-height: 300px;
+  overflow-y: scroll;
 }
 </style>

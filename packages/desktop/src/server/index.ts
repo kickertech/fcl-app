@@ -1,5 +1,4 @@
 import https from "https";
-import http from "http";
 import { promises as fs } from "fs";
 import logger from "../logger";
 import { initWebsocket, updateServerPassword, disconnectClients } from "./wss";
@@ -9,6 +8,7 @@ import { initIPCHandler } from "./ipc";
 import { createOverlayServer } from "./overlayserver";
 
 const port = 9901;
+const overlayPort = 9902;
 
 const createServer = async (
   serverConfig: any,
@@ -17,8 +17,7 @@ const createServer = async (
   accessKey: string,
   fingerprint: string,
   eventStore: EventStore,
-  ipcSend: (channel: string, ...args: any[]) => void,
-  callback: (server: https.Server) => void
+  ipcSend: (channel: string, ...args: any[]) => void
 ) => {
   publishService(serverConfig.serverName, port, fingerprint);
 
@@ -26,6 +25,8 @@ const createServer = async (
     cert: await fs.readFile(certPath),
     key: await fs.readFile(certKeyPath),
   });
+
+  const overlayServer = createOverlayServer(eventStore);
 
   initWebsocket(
     server,
@@ -38,8 +39,11 @@ const createServer = async (
 
   server.listen(port, () => {
     logger.info(`websocket server started on port ${port}`);
-    callback(server);
   });
+
+  overlayServer.listen(overlayPort, () => {
+    logger.info(`overlay server started on port ${overlayPort}`);
+  })
 };
 
 const updateServerName = async (name: string, fingerprint: string) => {

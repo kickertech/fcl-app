@@ -6,7 +6,7 @@ import logger from "./../../logger";
 
 export const SETTINGS_UPDATE = "settings:update";
 export const handleServerUpdate = async (event: any, cfg: any) => {
-  let serverConfig = await readConfig();
+  const serverConfig = await readConfig();
   const fingerprint = await getCertFingerprint();
   Object.keys(cfg).forEach((k) => {
     serverConfig[k] = cfg[k];
