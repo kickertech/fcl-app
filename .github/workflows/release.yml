@@ -44,8 +44,19 @@ jobs:
         with:
           node-version: 14
 
+      - name: patch node gyp on windows to support Visual Studio 2019
+        if: matrix.os == 'windows-latest'
+        shell: powershell
+        run: |
+          npm install --global node-gyp@latest node-gyp-build@latest
+          node-gyp -v
+          npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
+          npm install --global --production windows-build-tools --vs2015
+
       - name: build desktop
         run: |
+          node -v
+          npm -v
           npm config set -g production false
           npm i -g @ionic/cli
           make build-desktop

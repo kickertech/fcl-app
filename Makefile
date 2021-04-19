@@ -32,5 +32,7 @@ build-desktop: prepare-desktop
 build-android: prepare-android
 	# run jetifier for qrcode-scanner compat
 	# see: https://github.com/bitpay/cordova-plugin-qrscanner/issues/319#issuecomment-651862009
-	cd packages/clicker && npx jetify && ionic cap sync android
-	npm run android:build --prefix packages/clicker
+	cd packages/clicker && \
+		npx jetify && \
+		ionic cap sync android && \
+		npm run android:build
