@@ -2,7 +2,10 @@ module.exports = {
   presets: [
     ['@vue/cli-plugin-babel/preset',
       {
-        ignoreBrowserslistConfig: true
+        ignoreBrowserslistConfig: true,
+        targets: {
+          node: "current"
+        }
       }
     ]
   ]
