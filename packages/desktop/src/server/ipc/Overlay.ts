@@ -70,6 +70,7 @@ export const handleFileselect = (eventStore: EventStore) => async (event: any, m
 
   //
   const targetPath = path.join(targetDir, filename)
+  logger.info(`copying logo from ${selectedFile} ${targetPath}`)
   await fsp.copyFile(selectedFile, targetPath)
   switch (msg.position) {
     case "left":

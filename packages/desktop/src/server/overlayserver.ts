@@ -3,6 +3,10 @@ import path from "path";
 import { appDir } from "../config"
 import { EventStore } from "@kickertech/common/store/EventStore";
 
+const removeAppPrefix = (p: string) => {
+  return p.replace(path.join(appDir(), "logos/") , "").replace(/\\/g, '/')
+}
+
 const createOverlayServer = (eventStore: EventStore) => {
   const app = express();
 
@@ -10,9 +14,13 @@ const createOverlayServer = (eventStore: EventStore) => {
     res.sendFile(path.join(__static, "overlay", "index.html"))
   })
 
-  app.get("/logo/:name", (req, res) => {
-    const name = path.basename(req.params.name)
-    res.sendFile(path.join(appDir(), "logos", name))
+  app.get("/assets/*", (req, res) => {
+    const fp = req.path.replace("/assets/", "")
+    const desiredPath = path.join(appDir(), "logos", fp)
+    if(desiredPath.indexOf(appDir()) != 0){
+      return res.status(401).end()
+    }
+    res.sendFile(desiredPath)
   })
 
   app.get("/api", (req, res) => {
@@ -45,11 +53,11 @@ const createOverlayServer = (eventStore: EventStore) => {
     res.json({
       leftName: lname,
       rightName: rname,
-      leftLogo: path.basename(llogo),
-      rightLogo: path.basename(rlogo),
+      leftLogo: removeAppPrefix(llogo),
+      rightLogo: removeAppPrefix(rlogo),
       leftScore: lgoals,
       rightScore: rgoals,
-      streamerLogo: path.basename(streamerlogo),
+      streamerLogo: removeAppPrefix(streamerlogo),
       matchpointsLeft: lwon,
       matchpointsRight: rwon,
     })

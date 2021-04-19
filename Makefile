@@ -26,7 +26,8 @@ desktop-serve:
 
 .PHONY: build-desktop
 build-desktop: prepare-desktop
-	npm run electron:build --prefix packages/desktop
+	cd packages/desktop && \
+		npm run electron:build
 
 .PHONY: build-android
 build-android: prepare-android
