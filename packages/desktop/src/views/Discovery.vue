@@ -100,7 +100,7 @@ export default {
       return !re.test(addr);
     }
 
-    let browser = svc.find({ type: "fcl" }, (svc) => {
+    let browser = svc.find({ type: "fcl" }, (svc: any) => {
       console.log(svc);
       const services = state.services;
       services.push(svc);
@@ -117,7 +117,7 @@ export default {
     function refresh() {
       browser.stop();
       state.services = [];
-      browser = svc.find({ type: "fcl" }, (svc) => {
+      browser = svc.find({ type: "fcl" }, (svc: any) => {
         const services = state.services;
         services.push(svc);
         svc.addresses = svc.addresses.filter(notIPv6);

@@ -12,7 +12,7 @@ dependencies {
 
     implementation "org.jmdns:jmdns:3.5.5"
 }
-apply from: "../../../../node_modules/cordova-plugin-qrscanner/src/android/qrscanner.gradle"
+apply from: "../../node_modules/cordova-plugin-qrscanner/src/android/qrscanner.gradle"
 
 if (hasProperty('postBuildExtras')) {
   postBuildExtras()

@@ -281,12 +281,12 @@ export default {
       );
     };
 
-    const leftGoals = (events) => {
-      return events.filter((e) => e.type == GameEvents.TYPE_L_GOAL).length;
+    const leftGoals = (events: GameEvents.GameEvent[]) => {
+      return events.filter((e: GameEvents.GameEvent) => e.type == GameEvents.TYPE_L_GOAL).length;
     };
 
-    const rightGoals = (events) => {
-      return events.filter((e) => e.type == GameEvents.TYPE_R_GOAL).length;
+    const rightGoals = (events: GameEvents.GameEvent[]) => {
+      return events.filter((e: GameEvents.GameEvent) => e.type == GameEvents.TYPE_R_GOAL).length;
     };
 
     const undo = () => {
@@ -298,7 +298,7 @@ export default {
     const reset = () => {
       websocketState.events.reset(state.namespace);
       state.timer = 0;
-      clearTimeout(state.timerInterval);
+      clearTimeout(state.timerInterval as unknown as number);
       pushControlEvent(ControlEvents.EVENT_RESET);
     };
 

@@ -47,7 +47,8 @@ jobs:
       - name: build desktop
         run: |
           npm config set -g production false
-          make prepare build-desktop
+          npm i -g @ionic/cli
+          make build-desktop
 
       - name: Upload Asset
         id: upload-release-asset
@@ -76,7 +77,8 @@ jobs:
     - name: build Android App
       run: |
         npm config set -g production false
-        make prepare build-android
+        npm i -g @ionic/cli
+        make build-android
 
     - name: Upload Asset
       uses: actions/upload-release-asset@v1

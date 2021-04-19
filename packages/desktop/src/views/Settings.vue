@@ -106,7 +106,7 @@ export default {
     const getIPAddress = () => {
       "use strict";
 
-      const nets = networkInterfaces();
+      const nets = networkInterfaces() as any;
       const results = []; // Or just '{}', an empty object
 
       for (const name of Object.keys(nets)) {
