@@ -120,13 +120,26 @@ jobs:
         npm install --prefix packages/clicker
         make build-android
 
+    - uses: r0adkll/sign-android-release@v1
+      name: Sign app APK
+      # ID used to access action output
+      id: sign_app
+      with:
+        releaseDirectory: packages/clicker/android/app/build/outputs/apk/release
+        signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE }}
+        alias: ${{ secrets.KEYSTORE_ALIAS }}
+        keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
+      env:
+        // override default build-tools version (29.0.3) -- optional
+        BUILD_TOOLS_VERSION: "30.0.2"
+
     - name: Upload Asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ needs.create_release.outputs.upload_url }}
-        asset_path: packages/clicker/android/app/build/outputs/apk/release/app-release-unsigned.apk
+        asset_path: ${{ steps.sign_app.outputs.signedReleaseFile }}
         asset_name: fcl-clicker.apk
         asset_content_type: application/octet-stream
 
