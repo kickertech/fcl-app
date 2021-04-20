@@ -28,7 +28,7 @@ async function createWindow() {
   const win = new BrowserWindow({
     width: 1200,
     height: 800,
-    frame: false,
+    frame: true,
     webPreferences: {
       nodeIntegration: true,
       preload: path.join(__dirname, "preload.js"),
@@ -36,6 +36,7 @@ async function createWindow() {
   });
 
   // init config
+  console.log(`app dir: ${appDir()}`)
   await fs.mkdir(appDir(), { recursive: true });
   await initConfig();
   await initCert();
@@ -69,8 +70,15 @@ async function createWindow() {
 
   protocol.registerBufferProtocol("asset", async (request, respond) => {
     console.log(request.url)
-    let filePath = new URL(request.url).pathname;
-    filePath = decodeURI(filePath);
+    var isWin = process.platform === "win32";
+    let filePath = ""
+    if (isWin){
+      filePath = request.url.replace(/^(asset:\/\/)/,"")
+    }else {
+      filePath = new URL(request.url).pathname;
+      filePath = decodeURI(filePath);
+    }
+    
     console.log(`loading: ${filePath}`);
     if (filePath == "") {
       respond({ mimeType: "text", data: `file '${filePath}' not found` });

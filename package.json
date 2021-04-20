@@ -1,13 +1,10 @@
 {
   "name": "fcl-app",
   "version": "1.0.0",
-  "main": "index.js",
   "private": true,
   "repository": "git@github.com:kickertech/fcl-app.git",
   "author": "Moritz Johner <beller.moritz@googlemail.com>",
   "license": "MIT",
-  "devDependencies": {
-    "lerna": "^4.0.0"
-  },
+  "devDependencies": {},
   "dependencies": {}
 }
