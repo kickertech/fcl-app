@@ -44,21 +44,36 @@ jobs:
         with:
           node-version: 14
 
-      - name: patch node gyp on windows to support Visual Studio 2019
-        if: matrix.os == 'windows-latest'
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        run: |
+          echo "::set-output name=dir::$(npm config get cache)"
+
+      - uses: actions/cache@v2
+        id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: prepare windows environment
         shell: powershell
+        if: matrix.os == 'windows-latest'
         run: |
           npm install --global node-gyp@latest node-gyp-build@latest
-          node-gyp -v
           npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
           npm install --global --production windows-build-tools --vs2015
 
       - name: build desktop
+        env:
+          BROWSERSLIST: last 3 electron versions
         run: |
           node -v
           npm -v
           npm config set -g production false
           npm i -g @ionic/cli
+          npm install --prefix packages/desktop
           make build-desktop
 
       - name: Upload Asset
@@ -85,10 +100,24 @@ jobs:
       with:
         node-version: 14
 
+    - name: Get npm cache directory
+      id: npm-cache-dir
+      run: |
+        echo "::set-output name=dir::$(npm config get cache)"
+
+    - uses: actions/cache@v2
+      id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
+      with:
+        path: ${{ steps.npm-cache-dir.outputs.dir }}
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
     - name: build Android App
       run: |
         npm config set -g production false
         npm i -g @ionic/cli
+        npm install --prefix packages/clicker
         make build-android
 
     - name: Upload Asset
